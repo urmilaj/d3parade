@@ -41,82 +41,8 @@ function viz(){
 
           const color = d3.scaleOrdinal()
                           .range(["#d88c9a","#f2d0a9","#8e7dbe","#99c1b9","gold"])
-          
 
-          const point = svg.append("g")
-             .attr("transform",`translate(50,180)`)
-             .selectAll("project")
-             .data(project)
-             .join(enter=>{
-               enter.append("circle")
-                    .attr("class",d=>d.key)
-                    .attr("r",(d,i)=>{if (i<=4){return 10}
-                    else {return 50}})
-                    .attr("cx",(d,i)=>{if (i<=4){return i*120}
-                    else {return circleScaleX(d.key)}
-            })
-                    .attr("cy",(d,i)=>{if (i<=4){return 50}
-                  else {return circleScaleY(d.key)}
-            })
-                    .style("fill",(d,i)=>{if (i<=4){return "transparent"}
-                  else {return color(d.key)}})
-                    .style("stroke",(d,i)=>{if (i<=4){return "#d88c9a"}
-                  else {return color(d.key)}})
-                    .style("stroke-width",1.5)
-
-               
-             
-              
-          })
-          
-          
-          svg.selectAll("circle")
-             .filter((d,i)=>i>=5)
-             .each(trees)
-
-                             
-
-
-
-                  function trees(d,i){
-
-                    const hierarchy = d3.hierarchy(d.values)
-
-                    const tree = d3.tree()
-                                   .size([Math.PI,220*1.3])
-
-                    const root = tree(hierarchy)
-
-                    const radial = d3.linkRadial()
-                                  .angle(d=>d.x)
-                                   .radius(d=>d.y)
-
-                    const radials =  svg.append("g")
-                                        .attr("transform",`translate(50,180)
-                                               translate(${circleScaleX(d.key)},${circleScaleY(d.key)})`)
-
-                                      radials.selectAll("tidy")
-                                             .data(root.links())
-                                             .join("path")
-                                             .attr("d",i%2==0?radial.angle(d=>-d.x):radial.angle(d=>d.x))
-                                            .style("fill","none")
-                                            .style("stroke-width",d=>d.target.depth==1?0.8:1.3)
-                                            .style("stroke",color(d.key))
-                    
-
-                                      radials.selectAll("circle")
-                                             .data(root.descendants())
-                                             .join("circle")
-                                             .attr("transform", d => `
-                                                   rotate(${i%2==0?d.x * -180 / Math.PI - 90:d.x*180 / Math.PI - 90})
-                                                   translate(${d.y},0)
-                                                  `)
-                                             .attr("fill", color(d.key))
-                                             .attr("r",d=>d.depth==1?0:3);
-                  }
-
-
-         const annotations = [
+          const annotations = [
            {
             type:d3.annotationCustomType(
                d3.annotationCallout,
@@ -372,7 +298,102 @@ function viz(){
                              .annotations(annotations)
 
                              svg.append("g").attr("transform",`translate(50,180)`)
-                                .call(makeAnnot)        
+                                .call(makeAnnot)
+          
+
+          const point = svg.append("g")
+             .attr("transform",`translate(50,180)`)
+             .selectAll("project")
+             .data(project)
+             .join(enter=>{
+               enter.append("a")
+                    .attr("href",(d,i)=>{
+                      if (i==5){return "https://urmilaj.github.io/Earthquake/"}
+                      if (i==6) {return "https://observablehq.com/@urmilaj/under-the-influence"}
+                      if (i==7) {return "https://observablehq.com/@urmilaj/departed"}
+                      if(i==8) {return "https://observablehq.com/@urmilaj/world-power-plants"}
+                      if (i==9) {return "https://observablehq.com/@urmilaj/african-american-writers"}
+                      else {return null}})
+                    .attr("target","_blank")
+                    .append("circle")
+                    .attr("class",d=>d.key)
+                    .attr("r",(d,i)=>{if (i<=4){return 10}
+                    else {return 50}})
+                    .attr("cx",(d,i)=>{if (i<=4){return i*120}
+                    else {return circleScaleX(d.key)}
+            })
+                    .attr("cy",(d,i)=>{if (i<=4){return 50}
+                  else {return circleScaleY(d.key)}
+            })
+                    .style("fill",(d,i)=>{if (i<=4){return "transparent"}
+                  else {return color(d.key)}})
+                    .style("stroke",(d,i)=>{if (i<=4){return "#d88c9a"}
+                  else {return color(d.key)}})
+                    .style("stroke-width",1.5)    
+          })
+          
+          
+          svg.selectAll("circle")
+             .filter((d,i)=>i>=5)
+             .each(trees)
+
+
+                  function trees(d,i){
+
+                    const hierarchy = d3.hierarchy(d.values)
+
+                    const tree = d3.tree()
+                                   .size([Math.PI,220*1.3])
+
+                    const root = tree(hierarchy)
+
+                    const radial = d3.linkRadial()
+                                  .angle(d=>d.x)
+                                   .radius(d=>d.y)
+
+                    const radials =  svg.append("g")
+                                        .attr("transform",`translate(50,180)
+                                               translate(${circleScaleX(d.key)},${circleScaleY(d.key)})`)
+
+                                      radials.selectAll("tidy")
+                                             .data(root.links())
+                                             .join("path")
+                                             .attr("d",i%2==0?radial.angle(d=>-d.x):radial.angle(d=>d.x))
+                                            .style("fill","none")
+                                            .style("stroke-width",d=>d.target.depth==1?0.8:1.3)
+                                            .style("stroke",color(d.key))
+                    
+
+                    const source = radials.selectAll("circle")
+                                             .data(root.descendants().filter(d=>d.depth==2))
+                                             .enter()
+                                             .append("a")
+                                             .attr("href",d=>d.data[0].link)
+                                             .attr("target","_blank")
+                                             .append("circle")
+                                             .attr("transform", d => `
+                                                   rotate(${i%2==0?d.x * -180 / Math.PI - 90:d.x*180 / Math.PI - 90})
+                                                   translate(${d.y},0)
+                                                  `)
+                                             .attr("fill", color(d.key))
+                                             .attr("r",3)
+                                             .attr("data-tippy-content",d=>d.data[0].type+", "+d.data[0].source)
+                                             .on("mousemove",function (event,d){
+                                              d3.select(this)
+                                                .style("opacity",1)
+                                                .attr("r",8)})
+                                            .on("mouseout",function (event,d){
+                                              d3.select(this)
+                                                .style("opacity",1)
+                                                .attr("r",3)});
+
+                                    tippy(source.nodes(),{
+                                      theme:"light-border"
+                                    })
+                  }
+
+
+                 
 
         })
 
