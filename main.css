@@ -36,7 +36,6 @@ body {
     font-size: large;
     font-weight: bold;
   }
-
   .tippy-box[data-theme~='light-border'] {
     background: #F3904F;  /* fallback for old browsers */
     background: -webkit-linear-gradient(to right, #3B4371, #F3904F);  /* Chrome 10-25, Safari 5.1-6 */
@@ -46,3 +45,4 @@ body {
     font-family: serif;
     color:white;
     }
+
